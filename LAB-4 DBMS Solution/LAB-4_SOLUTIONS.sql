@@ -26,10 +26,20 @@ IN (SELECT SUPP_ID from Supplier_pricing GROUP BY (SUPP_ID) having count(SUPP_ID
 
 -- 4. Find the least expensive product from each category and print the table with category id, name, product name and price of the product
 -- Ans:
+-- using join
+SELECT c.cat_id ,c.CAT_NAME,p.PRO_NAME,min(sp.supp_price) as PRICE 
+from supplier_pricing sp
+inner JOIN product p 
+ON sp.PRO_ID=p.PRO_ID
+inner JOIN category c 
+ON c.cat_id=p.cat_id
+group by cat_id;
+
+-- using nested query
 SELECT cat.CAT_ID,cat.CAT_NAME,t2.PRO_NAME,MIN(t2.SUPP_PRICE) as PRICE 
 FROM category cat 
 INNER JOIN 
-(SELECT * from product p inner join (SELECT PRO_ID as id,SUPP_PRICE FROM Supplier_pricing GROUP BY (id) having MIN(SUPP_PRICE)) as t1 ON t1.id=p.PRO_ID) as t2 
+(SELECT * from product p inner join (SELECT PRO_ID as id,min(SUPP_PRICE) as SUPP_PRICE FROM Supplier_pricing GROUP BY (PRO_ID)) as t1 ON t1.id=p.PRO_ID) as t2 
 ON t2.CAT_ID=cat.CAT_ID 
 GROUP BY cat.CAT_ID;
  
