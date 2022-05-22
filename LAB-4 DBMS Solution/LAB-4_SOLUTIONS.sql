@@ -26,22 +26,12 @@ IN (SELECT SUPP_ID from Supplier_pricing GROUP BY (SUPP_ID) having count(SUPP_ID
 
 -- 4. Find the least expensive product from each category and print the table with category id, name, product name and price of the product
 -- Ans:
--- using join
-SELECT c.cat_id ,c.CAT_NAME,p.PRO_NAME,min(sp.supp_price) as PRICE 
-from supplier_pricing sp
-inner JOIN product p 
-ON sp.PRO_ID=p.PRO_ID
-inner JOIN category c 
-ON c.cat_id=p.cat_id
-group by cat_id;
-
--- using nested query
-SELECT cat.CAT_ID,cat.CAT_NAME,t2.PRO_NAME,MIN(t2.SUPP_PRICE) as PRICE 
-FROM category cat 
-INNER JOIN 
-(SELECT * from product p inner join (SELECT PRO_ID as id,min(SUPP_PRICE) as SUPP_PRICE FROM Supplier_pricing GROUP BY (PRO_ID)) as t1 ON t1.id=p.PRO_ID) as t2 
-ON t2.CAT_ID=cat.CAT_ID 
-GROUP BY cat.CAT_ID;
+SELECT c.cat_id ,c.CAT_NAME as 'Category Name',t2.pro_name as 'Product Name',t2.supp_price as PRICE 
+from category c
+inner JOIN 
+(SELECT p.PRO_ID,p.pro_name,p.cat_id,min(supp_price) as supp_price FROM Supplier_pricing sp inner JOIN product p ON sp.PRO_ID=p.PRO_ID GROUP BY (p.PRO_ID) order by supp_price ) as t2
+ ON c.cat_id=t2.cat_id 
+ group by c.cat_id;
  
  -- 5. Display the Id and Name of the Product ordered after “2021-10-05”.
  -- Ans:
